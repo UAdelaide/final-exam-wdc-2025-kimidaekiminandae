@@ -24,8 +24,13 @@
       <div class="card-body">
         <form @submit.prevent="submitWalkRequest">
           <div class="mb-3">
-            <label class="form-label">Dog ID</label>
-            <input v-model="form.dog_id" type="number" class="form-control" required>
+            <label class="form-label">Select Your Dog</label>
+            <select v-model="form.dog_id" class="form-select" required> <!-- Changed to form-select -->
+              <option disabled value="">-- Choose a dog --</option>
+              <option v-for="dog in myDogs" :key="dog.dog_id" :value="dog.dog_id">
+                {{ dog.name }}
+              </option>
+            </select>
           </div>
           <div class="mb-3">
             <label class="form-label">Requested Date & Time</label>
@@ -78,9 +83,9 @@
           dog_id: '',
           requested_time: '',
           duration_minutes: '',
-          location: ''
+          location: '',
         });
-
+        const myDogs = ref([]); // Fetched the owner's dogs
         const walks = ref([]);
         const message = ref('');
         const error = ref('');
@@ -102,6 +107,7 @@
               body: JSON.stringify(form.value)
             });
             const result = await res.json();
+            console.log(result);
 
             if (!res.ok) throw new Error(result.error || 'Error submitting walk request');
 
@@ -119,10 +125,20 @@
             message.value = '';
           }
         }
+        async function loadDogs() {
+          try {
+            const res = await fetch('/api/users/dogs');
+            myDogs.value = await res.json();
+          } catch (err) {
+            error.value = 'Failed to load your dogs';
+          }
+        }
 
         onMounted(() => {
-          loadWalks();
+          loadDogs();  // Load the owner's dogs
+          loadWalks(); // Load the owner's walk requests
         });
+
         // Logout function to clear session and redirect
         async function logout() {
           try {
@@ -133,11 +149,14 @@
           }
         }
 
+        
+
         return {
           form,
           walks,
           message,
           error,
+          myDogs,
           submitWalkRequest,
           logout
         };
