@@ -38,6 +38,28 @@
 
       <p class="text-danger mt-3" v-if="error">{{ error }}</p>
     </form>
+    <!-- Dog table -->
+    <h4 class="mt-5 text-center">All Registered Dogs</h4>
+    <table class="table table-bordered table-striped w-50 mx-auto">
+      <thead class="table-light">
+        <tr>
+          <th>Dog ID</th>
+          <th>Name</th>
+          <th>Size</th>
+          <th>Owner ID</th>
+          <th>Photo</th>
+        </tr>
+      </thead>
+      <tbody>
+  <tr v-for="dog in dogs" :key="dog.dog_id">
+    <td>{{ dog.dog_id }}</td>
+    <td>{{ dog.dog_name }}</td>
+    <td>{{ dog.size }}</td>
+    <td>{{ dog.owner_id }}</td>
+    <td><img :src="dog.photo" alt="Dog Photo" class="img-fluid rounded" style="max-height: 100px;"></td>
+  </tr>
+</tbody>
+    </table>
 
     <p class="lead text-center mt-5">Connect with trusted walkers for your beloved dog!</p>
   </div>
@@ -51,7 +73,9 @@
           message: 'Welcome to the Dog Walking Service!',
           email: '', // Changed to email for login
           password: '', // Changed to password for login
-          error: '' // Error message for login
+          error: '', // Error message for login
+          dogs: [] // Array to hold dog data
+
         };
       },
       methods: {
@@ -88,7 +112,31 @@
             this.error = 'Server error'; // Handle network or server errors
             console.error('Login error:', err);
           }
+        },
+        async fetchDogs() {
+          try {
+            const res = await fetch('/api/users/alldogs'); // Fetch all dogs from the server
+            console.log('Fetching dogs from API: ', res);
+            if (!res.ok) throw new Error('Failed to fetch dogs');
+            const dogList = await res.json();
+
+            // Fetch random images for each dog
+            for (const dog of dogList) {
+              const imgRes = await fetch('https://dog.ceo/api/breeds/image/random');
+              const imgData = await imgRes.json();
+              dog.photo = imgData.message;
+              console.log(`📸 Image added for ${dog.dog_name}`);
+            }
+
+            this.dogs = dogList;
+            console.log(' All dogs loaded:', this.dogs);
+          } catch (err) {
+            console.error(' Fetch dogs error:', err);
+          }
         }
+      },
+      mounted() {
+        this.fetchDogs();
       }
     }).mount('#app');
   </script>
