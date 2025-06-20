@@ -39,16 +39,6 @@
       100% { transform: rotate(45deg); }
     }
 
-    button {
-      padding: 50px;
-      font-size: 32px;
-      font-family: 'Tilt Prism', cursive;
-      background-color: yellow;
-      color: red;
-      border: 10px dotted green;
-      margin: 50px;
-      animation: shake2 0.1s infinite;
-    }
   </style>
 </head>
 <body>
@@ -59,7 +49,8 @@
       <img :src="dogImage || 'https://via.placeholder.com/300?text=No+Image'" alt="meow">
     </div>
 
-    <button @click="loadDog">Click me to see a cutie-patootie doggy !!woooooooof</button>
+    <button @click="loadDog" :style="buttonStyle">Click me to see a cutie-patootie doggy !!woooooooof</button>
+
 
     <p style="font-size:22px; color:#ff00ff;">
       Name: Mister Macshnaggets<br>
@@ -74,27 +65,48 @@
   <script>
     const { createApp } = Vue;
 
-    createApp({
-      data() {
-        return {
-          dogImage: 'https://via.placeholder.com/300?text=Loading...'
-        };
-      },
-      mounted() {
-        this.loadDog();
-      },
-      methods: {
-        async loadDog() {
-          try {
-            const res = await fetch('https://dog.ceo/api/breeds/image/random');
-            const data = await res.json();
-            this.dogImage = data.message;
-          } catch (e) {
-            alert("Something went wrong!");
-          }
-        }
+createApp({
+  data() {
+    return {
+      dogImage: 'https://via.placeholder.com/300?text=Loading...',
+      buttonStyle: {
+        padding: '50px',
+        fontSize: '32px',
+        position: 'relative'
       }
-    }).mount('#app');
+    };
+  },
+  mounted() {
+    this.loadDog();
+  },
+  methods: {
+    async loadDog() {
+      try {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random');
+        const data = await res.json();
+        this.dogImage = data.message;
+
+        const x = Math.floor(Math.random() * window.innerWidth * 0.8);
+        const y = Math.floor(Math.random() * window.innerHeight * 0.8);
+
+        this.buttonStyle = {
+          padding: '5px',
+          fontSize: '12px',
+          position: 'absolute',
+          top: `${y}px`,
+          left: `${x}px`,
+          backgroundColor: 'yellow',
+          color: 'red',
+          border: '5px dotted green',
+          fontFamily: `'Tilt Prism', cursive`,
+          animation: 'shake2 0.1s infinite'
+        };
+      } catch (e) {
+        alert("Something went wrong!");
+      }
+    }
+  }
+}).mount('#app');
   </script>
 </body>
 </html>
