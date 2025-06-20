@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dog of the Day</title>
+  <script src="https://unpkg.com/vue@3"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tilt+Prism&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(45deg, rgb(255, 0, 0), rgb(0, 255, 13), rgb(0, 0, 0), rgb(0, 255, 221));
+      animation: spin 5s infinite linear;
+      font-family: 'Creepster', cursive;
+      animation: shake2 0.1s infinite;
+    }
+
+    @keyframes shake2 {
+      0% { transform: rotate(1deg); }
+      50% { transform: rotate(-1deg); }
+      100% { transform: rotate(1deg); }
+    }
+
+
+    .crazy-layout {
+      display: grid;
+      grid-auto-rows: 200px;
+    }
+
+    img {
+      width: 300px;
+      height: 300px;
+      object-fit: cover;
+      border: 5px dashed red;
+      animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(45deg); }
+      50% { transform: rotate(-45deg); }
+      100% { transform: rotate(45deg); }
+    }
+
+    button {
+      padding: 50px;
+      font-size: 32px;
+      background-color: yellow;
+      color: red;
+      border: 10px dotted green;
+      margin: 50px;
+      animation: shake2 0.1s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1 style="text-align:center; font-size:50px;">🐶 DOG OF THE DAY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 🐶</h1>
+
+    <div class="crazy-layout">
+      <img :src="dogImage || 'https://via.placeholder.com/300?text=No+Image'" alt="meow">
+    </div>
+
+    <button @click="loadDog">Click me to see a cutie-patootie doggy !!woooooooof</button>
+
+    <p style="font-size:22px; color:#ff00ff;">
+      Name: Mister Macshnaggets<br>
+      Breed: Retriever-Boarder poodle megamix<br>
+      Rating: 7848/10<br>
+      Background Story: This DOGGIE IS THE BEST IN THE WORLD IT SAVED 7483 PEOPLE FROM FIRE 🐕⚔️🌈💥🔥<br>
+      <span style="color:red; background-color:lime;">Click the invisible checkbox to confirm you want to adopt this doggy! 🌈🌈🌈🌈🌈🌈</span>
+      <input type="checkbox" style="opacity:0">
+    </p>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          dogImage: 'https://via.placeholder.com/300?text=Loading...'
+        };
+      },
+      mounted() {
+        this.loadDog();
+      },
+      methods: {
+        async loadDog() {
+          try {
+            const res = await fetch('https://dog.ceo/api/breeds/image/random');
+            const data = await res.json();
+            this.dogImage = data.message;
+          } catch (e) {
+            alert("Something went wrong!");
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
