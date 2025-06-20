@@ -47,7 +47,18 @@
         const walks = ref([]);
         const message = ref('');
         const error = ref('');
-        const user = 3;
+        const user = ref(null); // Instead of using hardcoded user ID, we will load the current user
+        // Load current user to check if logged in
+        async function loadCurrentUser() {
+        try {
+          const res = await fetch('/api/users/me');
+          if (!res.ok) throw new Error('Not logged in');
+          user.value = await res.json();
+        } catch (err) {
+          window.location.href = '/'; // Redirect to login if not logged in
+          error.value = 'Please log in to access the walker dashboard.';
+        }
+      }
 
         async function loadWalkRequests() {
           try {
@@ -60,12 +71,14 @@
         }
 
         async function applyToWalk(requestId) {
+          if (!user.value) return; // Ensure user is logged in
           try {
             const res = await fetch(`/api/walks/${requestId}/apply`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ walker_id: user })
+              body: JSON.stringify({ walker_id: user.value.id })
             });
+            console.log("User ID:", user.value.id);
             const result = await res.json();
 
             if (!res.ok) throw new Error(result.error || 'Application failed');
@@ -79,6 +92,7 @@
         }
 
         onMounted(() => {
+          loadCurrentUser(); // Load current user to check if logged in
           loadWalkRequests();
         });
         // Logout function to clear session and redirect
